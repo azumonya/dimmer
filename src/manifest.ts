@@ -30,4 +30,13 @@ export default defineManifest({
   ],
   permissions: ['activeTab'],
   host_permissions: ['<all_urls>'],
+  commands: {
+    "toggle-mode": {
+      "suggested_key": {
+        "default": "Ctrl+K",
+        "mac": "Command+K"
+      },
+      "description": "Toggle mode"
+    }
+  },
 })

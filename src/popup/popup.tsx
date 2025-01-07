@@ -40,6 +40,10 @@ const Popup = () => {
 
   useEffect(() => {
     initCheck()
+    chrome.runtime.onMessage.addListener(handleMessage)
+    return () => {
+      chrome.runtime.onMessage.removeListener(handleMessage)
+    }
   }, [])
 
   const initCheck = () => {
@@ -63,7 +67,17 @@ const Popup = () => {
     }
   }
 
+  const handleMessage = (message: { action: string }) => {
+    if (message.action === 'updatePopupConfig') {
+      updatePopupConfig()
+    }
+  }
+
   useEffect(() => {
+    updatePopupConfig()
+  }, [inSettingPage])
+
+  const updatePopupConfig = () => {
     chrome.runtime.sendMessage({ action: 'getGlobal' }, (response) => {
       if (response) {
         globalState = response.state
@@ -101,7 +115,7 @@ const Popup = () => {
         }
       }
     })
-  }, [inSettingPage])
+  }
 
   const onNotice = (config: Config) => {
     if (globalState.isGlobal) {
