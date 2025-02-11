@@ -1,6 +1,6 @@
 import './index.css'
 
-import { SESSION_KEY, CLASS_KEY, ADVANCE_KEY } from '@/constant'
+import { SESSION_KEY, CLASS_KEY, ADVANCE_KEY, DOMAIN_SETTINGS_KEY } from '@/constant'
 
 type Filter = Record<string, string>
 
@@ -83,6 +83,14 @@ const readableConfig = (data: Record<string, number>): Record<string, string> =>
   return res
 }
 
+const getDomainSettings = () => {
+  try {
+    return JSON.parse(localStorage.getItem(DOMAIN_SETTINGS_KEY) || '{}')
+  } catch (e) {
+    return {}
+  }
+}
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   const { info, data = {} } = request
   if (info === 'changeMode' || info === 'toggleMode') {
@@ -106,7 +114,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           }
         }
       } else {
-        if (!root.classList.contains(CLASS_KEY)) {
+        const willBeDark = !root.classList.contains(CLASS_KEY)
+        if (willBeDark) {
           root.classList.add(CLASS_KEY)
           sessionStorage.setItem(SESSION_KEY, 'true')
           htmlFilter = {
@@ -121,6 +130,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             ...theme['0'],
           }
         }
+
+        const domainSettings = getDomainSettings()
+        domainSettings['isDark'] = willBeDark
+        localStorage.setItem(DOMAIN_SETTINGS_KEY, JSON.stringify(domainSettings))
       }
       root.style.filter = `${objectToFilterString(htmlFilter)}`
     })
@@ -175,21 +188,43 @@ function main() {
           }
         }
       } else {
+        const domainSettings = getDomainSettings()
+        const domainMode = domainSettings['isDark']
         const config = JSON.parse(sessionStorage.getItem(ADVANCE_KEY) || '{}')
-        const t = sessionStorage.getItem(SESSION_KEY)
-        if (t === 'true') {
-          root.classList.add(CLASS_KEY)
+
+        if (domainMode !== undefined) {
+          if (domainMode) {
+            root.classList.add(CLASS_KEY)
+            sessionStorage.setItem(SESSION_KEY, 'true')
+          } else {
+            root.classList.remove(CLASS_KEY)
+            sessionStorage.setItem(SESSION_KEY, 'false')
+          }
           htmlFilter = {
             ...htmlFilter,
             ...readableConfig(config),
-            ...theme['1'],
+            ...theme[domainMode ? '1' : '0'],
+          }
+
+          if (domainMode !== isDark) {
+            chrome.runtime.sendMessage({ action: 'updatePopupConfig' })
           }
         } else {
-          root.classList.remove(CLASS_KEY)
-          htmlFilter = {
-            ...htmlFilter,
-            ...readableConfig(config),
-            ...theme['0'],
+          const t = sessionStorage.getItem(SESSION_KEY)
+          if (t === 'true') {
+            root.classList.add(CLASS_KEY)
+            htmlFilter = {
+              ...htmlFilter,
+              ...readableConfig(config),
+              ...theme['1'],
+            }
+          } else {
+            root.classList.remove(CLASS_KEY)
+            htmlFilter = {
+              ...htmlFilter,
+              ...readableConfig(config),
+              ...theme['0'],
+            }
           }
         }
       }

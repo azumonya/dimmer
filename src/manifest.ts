@@ -28,7 +28,7 @@ export default defineManifest({
       matches: [],
     },
   ],
-  permissions: ['activeTab'],
+  permissions: ['activeTab', 'storage'],
   host_permissions: ['<all_urls>'],
   commands: {
     "toggle-mode": {
