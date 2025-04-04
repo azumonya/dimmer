@@ -1,0 +1,17 @@
+html::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: black;
+    opacity: 0.95;
+    pointer-events: none;
+    z-index: 2147483647;
+}
+
+html[data-dimmer-mask="hide"]::before,
+html.dimmerIsDark::before {
+    opacity: 0 !important;
+}

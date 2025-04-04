@@ -25,6 +25,11 @@ export default defineManifest({
   },
   content_scripts: [
     {
+      js: ['src/preload/index.ts'],
+      matches: ['<all_urls>'],
+      run_at: 'document_start',
+    },
+    {
       js: ['src/content/index.ts'],
       matches: ['<all_urls>'],
       run_at: 'document_end',

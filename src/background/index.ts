@@ -40,4 +40,10 @@ chrome.commands.onCommand.addListener((command) => {
   }
 })
 
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.status === 'complete' || changeInfo.status === 'failed') {
+    chrome.tabs.sendMessage(tabId, { info: 'hideMask' })
+  }
+})
+
 export {}
