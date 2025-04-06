@@ -1,3 +1,4 @@
+import { INIT_CLASS_KEY } from '@/constant';
 import './index.css'
 
 let timer: number | null = null;
@@ -17,6 +18,7 @@ function main() {
             const [root] = document.getElementsByTagName('html')
             if (root) {
                 root.setAttribute('data-dimmer-mask', 'hide')
+                root.classList.remove(INIT_CLASS_KEY)
             }
         }, 500)
     }
