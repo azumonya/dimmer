@@ -18,6 +18,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'getGlobal') {
     sendResponse({ state })
   }
+
+  if (message.action === 'hideMask') {
+    if (sender.tab?.id) {
+      let message = {
+        info: 'hideMask',
+      }
+      chrome.tabs.sendMessage(sender.tab.id, message, (res) => {})
+    }
+  }
 })
 
 chrome.commands.onCommand.addListener((command) => {
@@ -41,8 +50,16 @@ chrome.commands.onCommand.addListener((command) => {
 })
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.status === 'complete' || changeInfo.status === 'failed') {
-    chrome.tabs.sendMessage(tabId, { info: 'hideMask' })
+  if (changeInfo.status === 'loading') {
+    let message = {
+      info: 'initDimmer',
+    }
+    chrome.tabs.sendMessage(tabId, message, () => {})
+  } else if (changeInfo.status === 'complete') {
+    let message = {
+      info: 'hideMask',
+    }
+    chrome.tabs.sendMessage(tabId, message, () => {})
   }
 })
 

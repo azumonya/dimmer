@@ -1,5 +1,5 @@
 import './index.css'
-import { SESSION_KEY, CLASS_KEY, INIT_CLASS_KEY, ADVANCE_KEY, DOMAIN_DARK_KEY } from '@/constant'
+import { SESSION_KEY, CLASS_KEY, ADVANCE_KEY, DOMAIN_DARK_KEY } from '@/constant'
 import { matchWildcardUrls } from '@/utils'
 
 type Filter = Record<string, string>
@@ -165,7 +165,6 @@ function main() {
       const state = response.state
       const { isDark, isGlobal, config, excludeUrls } = state
       const root = document.getElementsByTagName('html')[0]
-      root.classList.add(INIT_CLASS_KEY)
       if (isGlobal) {
         if (isDark && matchWildcardUrls(window.location.href, excludeUrls) === false) {
           root.classList.add(CLASS_KEY)
@@ -220,6 +219,7 @@ function main() {
       }
       root.style.filter = `${objectToFilterString(htmlFilter)}`
     }
+    chrome.runtime.sendMessage({ action: 'hideMask' });
   })
   checkIsFullScreen()
 }

@@ -1,4 +1,4 @@
-html::before {
+body::before {
     content: '';
     position: fixed;
     top: 0;
@@ -11,7 +11,9 @@ html::before {
     z-index: 2147483647;
 }
 
-html[data-dimmer-mask="hide"]::before,
-html.dimmerIsDark::before {
-    opacity: 0 !important;
+html.dimmerIsDark,
+html[data-dimmer-mask='hide'] {
+  body::before {
+    display: none;
+  }
 }
